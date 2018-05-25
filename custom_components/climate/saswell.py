@@ -2,7 +2,8 @@
 Saswell platform that offers a Saswell climate device.
 
 For more details about this platform, please refer to the documentation
-https://home-assistant.io/components/climate/saswell
+https://home-assistant.io/components/climate
+
 """
 
 import asyncio
@@ -46,7 +47,7 @@ CONF_OPERATION_LIST = 'operation_list'
 CONF_FAN_LIST = 'fan_list'
 CONF_SWING_LIST = 'swing_list'
 
-DEFAULT_NAME = 'Saswell'
+DEFAULT_NAME = 'saswell'
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
@@ -75,7 +76,6 @@ async def async_setup_platform(hass, config, async_add_devices,
     devices = []
     for index in range(len(saswell.devs)):
         devices.append(SaswellClimate(saswell, name, index))
-    _LOGGER.debug("setup device: %s", devices)
     async_add_devices(devices)
 
     saswell.devices = devices
@@ -87,12 +87,12 @@ class SaswellClimate(ClimateDevice):
 
     def __init__(self, saswell, name, index):
         """Initialize the climate device."""
-        if index:
-            name += str(index + 1)
+        name += "_"
+        name += saswell.devs[index]['id']
         self._name = name
         self._index = index
         self._saswell = saswell
-        _LOGGER.debug("init SaswellClimate name: %s , index: %s ,saswell: %s", name,index,saswell)
+        _LOGGER.debug("init SaswellClimate name: %s , index: %s ,saswell: %s", name,index,saswell.devs[index])
 
     @property
     def name(self):
@@ -235,7 +235,7 @@ class SaswellData():
         """Update online data."""
         try:
             json = await self.request(LIST_URL)
-            _LOGGER.debug("update response json: %s", json)
+            _LOGGER.info("update response json: %s", json)
             if ('error' in json) and (json['error'] != '0'):
                 _LOGGER.debug("Reset token: error=%s", json['error'])
                 self._token = None
@@ -243,8 +243,9 @@ class SaswellData():
             devs = []
             for dev in json:
                 status = dev['status'].split(',')
-                _LOGGER.debug("update status: %s", status)
+                _LOGGER.debug("update status: %s", dev)
                 if( len(status) <= 1 ): # if status==['']
+                    _LOGGER.info("dev status error: %s",dev)
                     continue
                 devs.append({'is_on': status[1] == '1',
                              'away': status[5] == '1', #8?
@@ -253,7 +254,7 @@ class SaswellData():
                              'online': dev['online'] == '1',
                              'id': dev['id']})
 
-                _LOGGER.debug("update devs: %s", devs)
+                _LOGGER.debug("update devs: %s", devs[-1])
 
             self.devs = devs
             _LOGGER.info("List device: devs=%s", self.devs)
