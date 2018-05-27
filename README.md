@@ -25,4 +25,4 @@ climate:
 
 ### 版权说明
 
-本自定组件来自于Yonsm的saswell组件[https://github.com/Yonsm/HAExtra/blob/master/custom_components/climate/saswell.py]，我主要修改了服务器返回空的status的问题，同时对于使用多个saswell时index为序列号时带来的混乱问题。
+本自定组件来自于Yonsm的saswell组件 [https://github.com/Yonsm/HAExtra/blob/master/custom_components/climate/saswell.py] ，我主要修改了服务器返回空的status的问题，同时对于使用多个saswell时index为序列号时带来的混乱问题。
