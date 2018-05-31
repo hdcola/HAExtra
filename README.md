@@ -1,7 +1,7 @@
 # HAExtra
 自用的HA扩展组件
 
-## saswell
+## saswell温控器
 
 支持设备：
 
@@ -26,3 +26,17 @@ climate:
 ### 版权说明
 
 本自定组件来自于Yonsm的saswell组件 [https://github.com/Yonsm/HAExtra/blob/master/custom_components/climate/saswell.py] ，我主要修改了服务器返回空的status的问题，同时对于使用多个saswell时index为序列号时带来的混乱问题。
+
+## 中弘中央空调网关
+
+### 安装
+
+将```zhonghong.py```复制到```custom_components/climate/```目录下重启hass
+
+### 配置
+
+```
+climate:
+  - platform: zhonghong
+    host: your_hub_ip
+```
