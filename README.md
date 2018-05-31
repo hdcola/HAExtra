@@ -29,6 +29,14 @@ climate:
 
 ## 中弘中央空调网关
 
+支持设备：
+
+* 中弘网关
+
+空调：
+
+* 大金VRV中央空调
+
 ### 安装
 
 将```zhonghong.py```复制到```custom_components/climate/```目录下重启hass
@@ -40,3 +48,7 @@ climate:
   - platform: zhonghong
     host: your_hub_ip
 ```
+
+### 版权说明
+
+本自定组件来自于roiff的zhonghong组件 [https://bbs.hassbian.com/thread-3831-1-1.html]
