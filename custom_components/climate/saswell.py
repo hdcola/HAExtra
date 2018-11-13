@@ -2,8 +2,7 @@
 Saswell platform that offers a Saswell climate device.
 
 For more details about this platform, please refer to the documentation
-https://home-assistant.io/components/climate
-
+https://home-assistant.io/components/climate/saswell
 """
 
 import asyncio
@@ -67,7 +66,6 @@ async def async_setup_platform(hass, config, async_add_devices,
     scan_interval = config.get(CONF_SCAN_INTERVAL)
 
     saswell = SaswellData(hass, username, password)
-
     await saswell.update_data()
     if not saswell.devs:
         _LOGGER.error("No sensors added: %s.", name)
@@ -92,7 +90,6 @@ class SaswellClimate(ClimateDevice):
         self._name = name
         self._index = index
         self._saswell = saswell
-        _LOGGER.debug("init SaswellClimate name: %s , index: %s ,saswell: %s", name,index,saswell.devs[index])
 
     @property
     def name(self):
@@ -113,7 +110,7 @@ class SaswellClimate(ClimateDevice):
     @property
     def temperature_unit(self):
         """Return the unit of measurement."""
-        return self.unit_of_measurement
+        return self._saswell._hass.config.units.temperature_unit
 
     @property
     def target_temperature_step(self):
@@ -235,7 +232,6 @@ class SaswellData():
         """Update online data."""
         try:
             json = await self.request(LIST_URL)
-            _LOGGER.info("update response json: %s", json)
             if ('error' in json) and (json['error'] != '0'):
                 _LOGGER.debug("Reset token: error=%s", json['error'])
                 self._token = None
@@ -243,19 +239,12 @@ class SaswellData():
             devs = []
             for dev in json:
                 status = dev['status'].split(',')
-                _LOGGER.debug("update status: %s", dev)
-                if( len(status) <= 1 ): # if status==['']
-                    _LOGGER.info("dev status error: %s",dev)
-                    continue
                 devs.append({'is_on': status[1] == '1',
                              'away': status[5] == '1', #8?
                              'temperature': float(status[2]),
                              'target_temperature': float(status[3]),
                              'online': dev['online'] == '1',
                              'id': dev['id']})
-
-                _LOGGER.debug("update devs: %s", devs[-1])
-
             self.devs = devs
             _LOGGER.info("List device: devs=%s", self.devs)
         except BaseException:
